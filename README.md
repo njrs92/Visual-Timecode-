@@ -1,2 +1,2 @@
 # Visual-Timecode-
-Attempting to create a simple project for a cross platform to create LTC from audio outputs
+Attempting to create a simple project to allow for cross platform support to creat LTC from audio outputs devices
