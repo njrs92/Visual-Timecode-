@@ -1,6 +1,6 @@
 #include <iostream>
-#include <timecode.h>
-
+#include "timecode.h"
+#include "manchester.h"
 using namespace std;
 
 int main()
@@ -43,11 +43,17 @@ int main()
         color_set  = true;
         frame1.set_colorFlag(color_set);
             }
-    for (int i=0; i<=79; i++)
-    {
-    cout <<  "bit number" << i << "----" << frame1.getbit(i) << "\n";
-    }
+bool test_frame_encoded[160];
 
-    return 0;
+*test_frame_encoded = manchester(&test_frame_encoded[0],frame1);
+	
+for (int i = 0; i <= 159; i++)
+	{
+		cout << "bit number" << i << "pre encode bit number"<< i/2 << "----" << "pre encode bit" << frame1.getbit(i/2) << "---" << test_frame_encoded[i] << "\n";
+	}
+system("pause");
+return 0;
 }
+
+
 

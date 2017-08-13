@@ -1,6 +1,6 @@
 #ifndef TIMECODE_H
 #define TIMECODE_H
-#endif // TIMECODE_H
+
 
 #include <iostream>  //remove after testing
 using namespace std; //remove after testing
@@ -45,7 +45,7 @@ class timecode_frame
         int return_hours(void);
         bool getbit(int el);        //done
     private:
-        bool frame[79] = {false};
+        bool frame[80] = {false};
         frameRate Fr;
         void set_parity(void); //done
 };
@@ -53,7 +53,7 @@ class timecode_frame
 timecode_frame::timecode_frame(void)
 {
     int j=0;   // puting the syncWord in the frame
-    for(int i=64; i<=79;i++)
+    for(int i=64; i<=80;i++)
     {
         frame[i] = syncWord[j];
         j++;
@@ -616,3 +616,4 @@ void timecode_frame::set_parity(void) {
     }
 
 }
+#endif // TIMECODE_H
