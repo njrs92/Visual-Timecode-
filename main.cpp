@@ -54,6 +54,3 @@ for (int i = 0; i <= 159; i++)
 system("pause");
 return 0;
 }
-
-
-
