@@ -27,11 +27,12 @@ const bool bitArray8[4] = {0,0,0,1};
 const bool bitArray9[4] = {1,0,0,1};
 
 
-
 class timecode_frame
 {
     public:
         timecode_frame(void);
+		timecode_frame(const timecode_frame &obj); //makes copy of frame
+		void set_to_next_frame(void);
         void set_frameNumber(int f);//done
         void set_colorFlag(bool c); //done
         void set_seconds(int sec);  //done
@@ -43,12 +44,17 @@ class timecode_frame
         int return_sec(void);
         int return_min(void);
         int return_hours(void);
-        bool getbit(int el);        //done
+		bool getbit(int el);        //done
     private:
-        bool frame[80] = {false};
+		bool frame[80] = {false};
         frameRate Fr;
+		int current_frame = 0 ;
+		int current_sec = 0;
+		int current_min = 0 ;
+		int current_hour = 0;
         void set_parity(void); //done
 };
+
 
 timecode_frame::timecode_frame(void)
 {
@@ -61,6 +67,20 @@ timecode_frame::timecode_frame(void)
     frame[11] =  true ;//assuming Color
     Fr = F25; // the following is setting the frame as 25pfs
     this ->set_parity();
+
+}
+
+timecode_frame::timecode_frame(const timecode_frame &obj)
+{
+	for (int i = 0; i < 80; i++)
+	{
+	frame[i] = obj.frame[i];
+	}
+	
+}
+
+void set_to_next_frame(void) {
+
 
 }
 
@@ -183,10 +203,11 @@ this ->set_parity();;
 
 void timecode_frame::set_seconds(int sec)
 {
+
     if ( (sec >= 60) || (sec<0)) { // ensuring that sec is vaild
         sec = 0;
     }
-
+	current_sec = sec;
     int j = 0;
     //first Number
     int temp = sec % 10;
@@ -592,7 +613,6 @@ void timecode_frame::set_clockFlag(bool c) {
 
         frame[58] =  c ;
         this ->set_parity();}
-
 
 void timecode_frame::set_frameRate(frameRate f) {
     Fr = f;

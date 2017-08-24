@@ -23,7 +23,7 @@
     <ClInclude Include="timecode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="manchester.h">
+    <ClInclude Include="manchester.cpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
