@@ -79,8 +79,8 @@ system("pause");
 //system("pause");
 
 
-unsigned char HIGH = 255;
-unsigned char LOW = 0;
+unsigned char HIGH = 245;
+unsigned char LOW = 10;
 
 unsigned char fp1[1920];
 for (int i = 0;  i < 1920;  i++)

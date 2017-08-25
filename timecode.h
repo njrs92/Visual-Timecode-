@@ -1,50 +1,45 @@
 #ifndef TIMECODE_H
 #define TIMECODE_H
 
-
-#include <iostream>  //remove after testing
-using namespace std; //remove after testing
-
 enum frameRate
     {
-    F24,
-    F25,
-    F29,
-    F30
+    F24 = 24,
+    F25 = 25,
+    F29 = 29,
+    F30 = 30
     };
 
-const bool syncWord[16] = {0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1};
-
-const bool bitArray0[4] = {0,0,0,0}; //lok up table for BDC
-const bool bitArray1[4] = {1,0,0,0}; //cbf doing bitwise shit
-const bool bitArray2[4] = {0,1,0,0}; //least significant bit first
-const bool bitArray3[4] = {1,1,0,0};
-const bool bitArray4[4] = {0,0,1,0};
-const bool bitArray5[4] = {1,0,1,0};
-const bool bitArray6[4] = {0,1,1,0};
-const bool bitArray7[4] = {1,1,1,0};
-const bool bitArray8[4] = {0,0,0,1};
-const bool bitArray9[4] = {1,0,0,1};
+constexpr  bool syncWord[16] = {0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1};
+constexpr  bool bitArray0[4] = {0,0,0,0}; //lok up table for BDC
+constexpr  bool bitArray1[4] = {1,0,0,0}; //cbf doing bitwise 
+constexpr  bool bitArray2[4] = {0,1,0,0}; //least significant bit first
+constexpr  bool bitArray3[4] = {1,1,0,0};
+constexpr  bool bitArray4[4] = {0,0,1,0};
+constexpr  bool bitArray5[4] = {1,0,1,0};
+constexpr  bool bitArray6[4] = {0,1,1,0};
+constexpr  bool bitArray7[4] = {1,1,1,0};
+constexpr  bool bitArray8[4] = {0,0,0,1};
+constexpr  bool bitArray9[4] = {1,0,0,1};
 
 
 class timecode_frame
 {
     public:
         timecode_frame(void);
-		timecode_frame(const timecode_frame &obj); //makes copy of frame
+		timecode_frame(const timecode_frame &obj); //makes copy of a frame
 		void set_to_next_frame(void);
-        void set_frameNumber(int f);//done
-        void set_colorFlag(bool c); //done
-        void set_seconds(int sec);  //done
-        void set_minutes(int min);  //done
-        void set_hours(int hor);    //done
-        void set_frameRate(frameRate f); //done
-        void set_clockFlag(bool c); //done
+        void set_frameNumber(int f);
+        void set_colorFlag(bool c); 
+        void set_seconds(int sec);  
+        void set_minutes(int min);  
+        void set_hours(int hor);    
+        void set_frameRate(frameRate f); 
+        void set_clockFlag(bool c); 
         int return_frameNum(void);
         int return_sec(void);
         int return_min(void);
-        int return_hours(void);
-		bool getbit(int el);        //done
+        int return_hour(void);
+		bool getbit(int el);        
     private:
 		bool frame[80] = {false};
         frameRate Fr;
@@ -52,17 +47,16 @@ class timecode_frame
 		int current_sec = 0;
 		int current_min = 0 ;
 		int current_hour = 0;
-        void set_parity(void); //done
+        void set_parity(void); 
 };
 
 
 timecode_frame::timecode_frame(void)
 {
-    int j=0;   // puting the syncWord in the frame
+
     for(int i=64; i<=80;i++)
     {
-        frame[i] = syncWord[j];
-        j++;
+        frame[i] = syncWord[i -64];
     }
     frame[11] =  true ;//assuming Color
     Fr = F25; // the following is setting the frame as 25pfs
@@ -76,12 +70,48 @@ timecode_frame::timecode_frame(const timecode_frame &obj)
 	{
 	frame[i] = obj.frame[i];
 	}
-	
+
+	Fr = obj.Fr;
+	current_frame = obj.current_frame;
+	current_sec = obj.current_sec;
+	current_min = obj.current_min;
+	current_hour = obj.current_hour;
+			
 }
 
-void set_to_next_frame(void) {
-
-
+void timecode_frame::set_to_next_frame(void)
+{
+	if (current_frame < (Fr -1))
+	{
+		set_frameNumber(current_frame + 1);
+	}
+		
+	else if (current_sec < 59)
+	{
+		set_frameNumber(0);
+		set_seconds(current_sec + 1);
+	}
+	else if (current_min < 59)
+	{
+		set_frameNumber(0);
+		set_seconds(0);
+		set_minutes(current_min + 1);
+	}
+	else if (current_hour < 23)
+	{
+		set_frameNumber(0);
+		set_seconds(0);
+		set_minutes(0);
+		set_hours(current_hour + 1);
+	}
+	else
+	{
+		set_frameNumber(0);
+		set_seconds(0);
+		set_minutes(0);
+		set_hours(0);
+	}
+	return;
 }
 
 void timecode_frame::set_frameNumber(int f)
@@ -90,6 +120,8 @@ void timecode_frame::set_frameNumber(int f)
         f = 0;
     }
 
+	current_frame = f;
+	
     int j = 0;
     //first Number
     int temp = f % 10;
@@ -347,6 +379,8 @@ void timecode_frame::set_minutes(int min)
         min = 0;
     }
 
+	current_min = min;
+
     int j = 0;
     //first Number
     int temp = min % 10;
@@ -486,6 +520,9 @@ void timecode_frame::set_hours(int hor)
         hor = 0;
             }
     int j = 0;
+
+	current_frame = hor;
+
     //first Number
 
     int temp = (hor % 10);
@@ -636,4 +673,21 @@ void timecode_frame::set_parity(void) {
     }
 
 }
+
+int timecode_frame::return_frameNum(void) {
+	return timecode_frame::current_frame;
+}
+
+int timecode_frame::return_sec(void) {
+	return timecode_frame::current_sec;
+}
+
+int timecode_frame::return_min(void) {
+	return timecode_frame::current_min;
+}
+
+int timecode_frame::return_hour(void) {
+	return timecode_frame::current_hour;
+}
+
 #endif // TIMECODE_H
