@@ -3,163 +3,56 @@
 #include "timecode.h"
 #include "manchester.cpp"
 #include <stdio.h>
-#include <math.h>
 #include <Windows.h>
 
+//OpenAl Includes
 #include <al.h>
 #include <alc.h>
 
-#include <vector>
-#include <limits>
 
 using namespace std;
 
-int endWithError(char* msg, int error = 0)
-{
-	cout << msg << "\n";
-	system("PAUSE");
-	return error;
-}
-
 int main()
 {
-    int sec_input;
-    int min_input;
-    int temp; // needed because it was doing strange shit
+	timecode_frame frame;
+	int input;
+	
+	cout << "Enter Frame";
+    cin >> input;
+	frame.set_frameNumber(input);
+	cin.clear();
 
-	cout << "enter frame" ;
-    cin >> temp;
-    const int frame_input = temp;
-
-    cout << "enter seconds" ;
-    cin >> sec_input;
-
-    cout << "enter minutes" ;
-    cin >> min_input;
-
-    cout << "enter hours" ;
-    cin >> temp;
-    const int hour_input = temp;
-    cout << "time entered" << std::endl <<  hour_input << ":" << min_input << ":" << sec_input << ":" << frame_input ;
+	cout << "Enter Seconds";
+	cin >> input;
+	frame.set_seconds(input);
+	cin.clear();
+    
+	cout << "enter Minuntes";
+	cin >> input;
+	frame.set_minutes(input);
+	cin.clear();
+		
+	cout << "Enter Hours";
+	cin >> input;
+	frame.set_hours(input);
+	cin.clear();
+		
+	cout << "Time Entered" << std::endl <<  frame.return_hour() << ":" << frame.return_min() << ":" << frame.return_sec() << ":" << frame.return_frameNum() ;
     cout << "\n" ;
 
-    timecode_frame frame1;
-    frame1.set_frameNumber(frame_input);
-    frame1.set_seconds(sec_input);
-    frame1.set_hours(hour_input);
-    frame1.set_minutes(min_input);
-	frame1.set_colorFlag(true);
-	
-	system("pause");
+    frame.set_colorFlag(true);
+		system("pause");
 
-	timecode_frame  frame2 = frame1;
-	frame2.set_to_next_frame();
-	
-	timecode_frame  frame3 = frame3;
-	frame3.set_to_next_frame();
-
-	timecode_frame  frame4 = frame3;
-	frame4.set_to_next_frame();
-	
-	bool frame1_encoded[160];
-	manchester(frame1_encoded,frame1);
-	
-	bool frame2_encoded[160];
-	manchester(frame2_encoded, frame2);
-
-	bool frame3_encoded[160];
-	manchester(frame2_encoded, frame2);
-
-	bool frame4_encoded[160];
-	manchester(frame2_encoded, frame2);
 
 unsigned char HIGH = 245;
 unsigned char LOW = 10;
 
-unsigned char fp1[1600];
-for (int i = 0;  i < 1600;  i++)
-{
-	if (i % 10 == 0)
-	{
-		if (frame1_encoded[i / 10] == true)
-		{
-			fp1[i] = HIGH;
-		}
-		else
-		{
-			fp1[i] = LOW;
-		}
-	}
-	else
-	{
-		fp1[i] = fp1[i - 1];
-	}
-}
+unsigned char fp1[1600] = { 0 };
+unsigned char fp2[1600] = { 0 };
+unsigned char fp3[1600] = { 0 };
+unsigned char fp4[1600] = { 0 };
 
-unsigned char fp2[1600];
-for (int i = 0; i < 1600; i++)
-{
-	if (i % 10 == 0)
-	{
-		if (frame2_encoded[i / 10] == true)
-		{
-			fp2[i] = HIGH;
-		}
-		else
-		{
-			fp2[i] = LOW;
-		}
-	}
-	else
-	{
-		fp2[i] = fp2[i - 1];
-	}
-}
-
-unsigned char fp3[1600];
-for (int i = 0; i < 1600; i++)
-{
-	if (i % 10 == 0)
-	{
-		if (frame3_encoded[i / 10] == true)
-		{
-			fp3[i] = HIGH;
-		}
-		else
-		{
-			fp3[i] = LOW;
-		}
-	}
-	else
-	{
-		fp3[i] = fp3[i - 1];
-	}
-}
-
-unsigned char fp4[1600];
-for (int i = 0; i < 1600; i++)
-{
-	if (i % 10 == 0)
-	{
-		if (frame4_encoded[i / 10] == true)
-		{
-			fp4[i] = HIGH;
-		}
-		else
-		{
-			fp4[i] = LOW;
-		}
-	}
-	else
-	{
-		fp4[i] = fp4[i - 1];
-	}
-}
-
-timecode_frame *frame_combined[4] = { &frame1 ,&frame2 ,&frame3 ,&frame4 };
-bool frame_encoded_combined[4] = { &frame1_encoded[0] ,&frame2_encoded[0] ,&frame3_encoded[0] ,&frame4_encoded[0]};
-unsigned char *fp_combined[4] = { &fp1[0], &fp2[0], &fp3[0], &fp4[0] };
-
+unsigned char *fp_combined[4] = { &fp1[0],&fp2[0],&fp3[0],&fp4[0] };
 
 ALCdevice *device;
 ALCcontext *context;
@@ -191,30 +84,23 @@ ALfloat ListenerOri[] = { 0.0, 0.0, -1.0, 0.0, 1.0, 0.0 };
 alListenerfv(AL_POSITION, ListenerPos);
 alListenerfv(AL_VELOCITY, ListenerVel);
 alListenerfv(AL_ORIENTATION, ListenerOri);
-
-//alSourcei(source, AL_BUFFER, buffer[0]);
 alSourcef(source, AL_PITCH, 1.0f);
 alSourcef(source, AL_GAIN, 1.0f);
 alSourcefv(source, AL_POSITION, SourcePos);
 alSourcefv(source, AL_VELOCITY, SourceVel);
-//alSourcei(source, AL_LOOPING, AL_TRUE);
+alSourcei(source, AL_LOOPING, AL_FALSE);
 
 ALint iBuffersProcessed = 0;
 ALuint	uiBuffer;
 ALint	iState;
-
-
-bool last_bit = frame4_encoded[159];
+bool last_bit = FALSE;
 bool frame_encoded[160];
 unsigned char fp[1600] = { 0 };
-timecode_frame frame ;
-frame.set_to_next_frame();
+
 
 Repeat:
 iBuffersProcessed = 0;
 alGetSourcei(source, AL_BUFFERS_PROCESSED, &iBuffersProcessed);
-
-
 
 while (iBuffersProcessed)
 {
@@ -243,6 +129,7 @@ while (iBuffersProcessed)
 			fp[i] = fp[i-1];
 		}
 	}
+
 	last_bit = frame_encoded[159];
 	alBufferData(uiBuffer, format, fp, 1600, 40000);
 	alSourceQueueBuffers(source, 1, &uiBuffer);
@@ -251,11 +138,12 @@ while (iBuffersProcessed)
 }
 
 alGetSourcei(source, AL_SOURCE_STATE, &iState);
+
 if (iState != AL_PLAYING) {
-	cout << "Stoped";
 	alSourcePlay(source);
 }
-Sleep(10);
+Sleep(100);
+
 goto Repeat;
 
 

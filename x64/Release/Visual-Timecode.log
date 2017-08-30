@@ -1,3 +1,2 @@
 ﻿  main.cpp
-main.cpp(160): warning C4838: conversion from 'bool *' to 'bool' requires a narrowing conversion
   Visual-Timecode.vcxproj -> C:\Users\stevensn2h\Source\Repos\Visual-Timecode-\x64\Release\Visual-Timecode.exe
