@@ -1,6 +1,8 @@
 #ifndef TIMECODE_H
 #define TIMECODE_H
 
+
+
 enum frameRate
     {
     F24 = 24,
@@ -39,7 +41,8 @@ class timecode_frame
         int return_sec(void);
         int return_min(void);
         int return_hour(void);
-		bool getbit(int el);        
+		bool getbit(int el);
+		int current_frameRate(void);        
     private:
 		bool frame[80] = {false};
         frameRate Fr;
@@ -47,6 +50,7 @@ class timecode_frame
 		int current_sec = 0;
 		int current_min = 0 ;
 		int current_hour = 0;
+		
         void set_parity(void); 
 };
 
@@ -81,7 +85,7 @@ timecode_frame::timecode_frame(const timecode_frame &obj)
 
 void timecode_frame::set_to_next_frame(void)
 {
-	if (current_frame < (Fr -1))
+	if (current_frame < (25 -1))
 	{
 		set_frameNumber(current_frame + 1);
 	}
@@ -688,6 +692,12 @@ int timecode_frame::return_min(void) {
 
 int timecode_frame::return_hour(void) {
 	return timecode_frame::current_hour;
+}
+
+
+int timecode_frame::current_frameRate(void)
+{
+	return timecode_frame::Fr;
 }
 
 #endif // TIMECODE_H
