@@ -1,6 +1,6 @@
 
 #include <iostream>
-#include "timecode.h"
+#include "timecode.cpp"
 #include "manchester.cpp"
 #include <stdio.h>
 #include <Windows.h>

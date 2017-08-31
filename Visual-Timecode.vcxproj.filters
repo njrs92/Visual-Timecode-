@@ -20,10 +20,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="timecode.h">
+    <ClInclude Include="manchester.cpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="manchester.cpp">
+    <ClInclude Include="timecode.cpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

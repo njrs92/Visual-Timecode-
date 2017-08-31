@@ -1,5 +1,5 @@
-#ifndef TIMECODE_H
-#define TIMECODE_H
+#ifndef TIMECODE_CPP
+#define TIMECODE_CPP
 
 
 
@@ -12,23 +12,23 @@ enum frameRate
     };
 
 constexpr  bool syncWord[16] = {0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1};
-constexpr  bool bitArray0[4] = {0,0,0,0}; //lok up table for BDC
-constexpr  bool bitArray1[4] = {1,0,0,0}; //cbf doing bitwise 
-constexpr  bool bitArray2[4] = {0,1,0,0}; //least significant bit first
-constexpr  bool bitArray3[4] = {1,1,0,0};
-constexpr  bool bitArray4[4] = {0,0,1,0};
-constexpr  bool bitArray5[4] = {1,0,1,0};
-constexpr  bool bitArray6[4] = {0,1,1,0};
-constexpr  bool bitArray7[4] = {1,1,1,0};
-constexpr  bool bitArray8[4] = {0,0,0,1};
-constexpr  bool bitArray9[4] = {1,0,0,1};
+	constexpr  bool bitArray0[4] = {0,0,0,0}; //lok up table for BDC
+	constexpr  bool bitArray1[4] = {1,0,0,0}; //least significant bit first
+	constexpr  bool bitArray2[4] = {0,1,0,0}; 
+	constexpr  bool bitArray3[4] = {1,1,0,0};
+	constexpr  bool bitArray4[4] = {0,0,1,0};
+	constexpr  bool bitArray5[4] = {1,0,1,0};
+	constexpr  bool bitArray6[4] = {0,1,1,0};
+	constexpr  bool bitArray7[4] = {1,1,1,0};
+	constexpr  bool bitArray8[4] = {0,0,0,1};
+	constexpr  bool bitArray9[4] = {1,0,0,1};
 
 
 class timecode_frame
 {
     public:
         timecode_frame(void);
-		timecode_frame(const timecode_frame &obj); //makes copy of a frame
+		timecode_frame(timecode_frame &obj); //makes copy of a frame
 		void set_to_next_frame(void);
         void set_frameNumber(int f);
         void set_colorFlag(bool c); 
@@ -36,13 +36,15 @@ class timecode_frame
         void set_minutes(int min);  
         void set_hours(int hor);    
         void set_frameRate(frameRate f); 
-        void set_clockFlag(bool c); 
-        int return_frameNum(void);
+        void set_clockFlag(bool c);
+		void set_dropFlag(bool d);
+        int current_frameRate(void);   
+		int return_frameNum(void);
         int return_sec(void);
         int return_min(void);
         int return_hour(void);
 		bool getbit(int el);
-		int current_frameRate(void);        
+		     
     private:
 		bool frame[80] = {false};
         frameRate Fr;
@@ -50,15 +52,13 @@ class timecode_frame
 		int current_sec = 0;
 		int current_min = 0 ;
 		int current_hour = 0;
-		
-        void set_parity(void); 
+		void set_parity(void); 
 };
-
 
 timecode_frame::timecode_frame(void)
 {
 
-    for(int i=64; i<=80;i++)
+    for(int i=64; i<80;i++)
     {
         frame[i] = syncWord[i -64];
     }
@@ -68,7 +68,7 @@ timecode_frame::timecode_frame(void)
 
 }
 
-timecode_frame::timecode_frame(const timecode_frame &obj)
+timecode_frame::timecode_frame(timecode_frame &obj)
 {
 	for (int i = 0; i < 80; i++)
 	{
@@ -85,7 +85,7 @@ timecode_frame::timecode_frame(const timecode_frame &obj)
 
 void timecode_frame::set_to_next_frame(void)
 {
-	if (current_frame < (25 -1))
+	if (current_frame < (Fr - 1))
 	{
 		set_frameNumber(current_frame + 1);
 	}
@@ -118,124 +118,124 @@ void timecode_frame::set_to_next_frame(void)
 	return;
 }
 
-void timecode_frame::set_frameNumber(int f)
-{
-    if( (f >= 30) || (f<0)) { // ensuring that f is vaild
-        f = 0;
-    }
+	void timecode_frame::set_frameNumber(int f)
+	{
+		if( (f >= 30) || (f<0)) { // ensuring that f is vaild
+			f = 0;
+		}
 
-	current_frame = f;
+		current_frame = f;
 	
-    int j = 0;
-    //first Number
-    int temp = f % 10;
-    switch (temp) {
-    case 0 :
-        for(int i=0; i<=3;i++)
-        {
-            frame[i] = bitArray0[j];
-            j++;
-        }; break;
+		int j = 0;
+		//first Number
+		int temp = f % 10;
+		switch (temp) {
+		case 0 :
+			for(int i=0; i<=3;i++)
+			{
+				frame[i] = bitArray0[j];
+				j++;
+			}; break;
 
-    case 1 :
-        for(int i=0; i<=3;i++)
-        {
-            frame[i] = bitArray1[j];
-            j++;
-        }; break;
+		case 1 :
+			for(int i=0; i<=3;i++)
+			{
+				frame[i] = bitArray1[j];
+				j++;
+			}; break;
 
-    case 2 :
-        for(int i=0; i<=3;i++)
-        {
-            frame[i] = bitArray2[j];
-            j++;
-        }; break;
-
-
-    case 3 :
-
-        for(int i=0; i<=3;i++)
-        {
-            frame[i] = bitArray3[j];
-            j++;
-        }; break;
-
-    case 4 :
-        for(int i=0; i<=3;i++)
-        {
-            frame[i] = bitArray4[j];
-            j++;
-        }; break;
-
-    case 5 :
-
-        for(int i=0; i<=3;i++)
-        {
-         frame[i] = bitArray5[j];
-
-            j++;
-        }; break;
+		case 2 :
+			for(int i=0; i<=3;i++)
+			{
+				frame[i] = bitArray2[j];
+				j++;
+			}; break;
 
 
-    case 6 :
-        for(int i=0; i<=3;i++)
-        {
-            frame[i] = bitArray6[j];
-            j++;
-        }; break;
+		case 3 :
+
+			for(int i=0; i<=3;i++)
+			{
+				frame[i] = bitArray3[j];
+				j++;
+			}; break;
+
+		case 4 :
+			for(int i=0; i<=3;i++)
+			{
+				frame[i] = bitArray4[j];
+				j++;
+			}; break;
+
+		case 5 :
+
+			for(int i=0; i<=3;i++)
+			{
+			 frame[i] = bitArray5[j];
+
+				j++;
+			}; break;
 
 
-    case 7 :
-        for(int i=0; i<=3;i++)
-        {
-            frame[i] = bitArray7[j];
-            j++;
-        }; break;
-
-    case 8 :
-        for(int i=0; i<=3;i++)
-        {
-            frame[i] = bitArray8[j];
-            j++;
-        }; break;
-
-    case 9 :
-        for(int i=0; i<=3;i++)
-        {
-            frame[i] = bitArray9[j];
-            j++;
-        }; break;
-    }
-    //2nd number
-    temp = f - (f % 10);
-
-    switch (temp) {
-    case 00 :
-        j = 0;
-        for(int i=8; i<=9;i++)
-        {
-            frame[i] = bitArray0[j];
-            j++;
-        }; break;
-    case 10 :
-        j = 0;
-        for(int i=8; i<=9;i++)
-        {
-            frame[i] = bitArray1[j];
-            j++;
-        }; break;
-    case 20 :
-        j = 0;
-        for(int i=8; i<=9;i++)
-        {
-            frame[i] = bitArray2[j];
-            j++;
-        }; break;
+		case 6 :
+			for(int i=0; i<=3;i++)
+			{
+				frame[i] = bitArray6[j];
+				j++;
+			}; break;
 
 
-}
-this ->set_parity();;
-}
+		case 7 :
+			for(int i=0; i<=3;i++)
+			{
+				frame[i] = bitArray7[j];
+				j++;
+			}; break;
+
+		case 8 :
+			for(int i=0; i<=3;i++)
+			{
+				frame[i] = bitArray8[j];
+				j++;
+			}; break;
+
+		case 9 :
+			for(int i=0; i<=3;i++)
+			{
+				frame[i] = bitArray9[j];
+				j++;
+			}; break;
+		}
+		//2nd number
+		temp = f - (f % 10);
+
+		switch (temp) {
+		case 00 :
+			j = 0;
+			for(int i=8; i<=9;i++)
+			{
+				frame[i] = bitArray0[j];
+				j++;
+			}; break;
+		case 10 :
+			j = 0;
+			for(int i=8; i<=9;i++)
+			{
+				frame[i] = bitArray1[j];
+				j++;
+			}; break;
+		case 20 :
+			j = 0;
+			for(int i=8; i<=9;i++)
+			{
+				frame[i] = bitArray2[j];
+				j++;
+			}; break;
+
+
+	}
+	this ->set_parity();
+	}
 
 void timecode_frame::set_seconds(int sec)
 {
@@ -519,13 +519,11 @@ this ->set_parity();
 
 void timecode_frame::set_hours(int hor)
 {
-
-    if ( (hor >= 24) || (hor<0)) { // ensuring that hor is vaild
+	if ( (hor >= 24) || (hor<0)) { // ensuring that hor is vaild
         hor = 0;
             }
     int j = 0;
-
-	current_frame = hor;
+	current_hour = hor;
 
     //first Number
 
@@ -641,6 +639,10 @@ this ->set_parity();
 }
 
 bool timecode_frame::getbit(int el) {
+	if ((el >= 80) || (el<0)) { //insuring that el is vaild
+		el = 0;
+	}
+
     return timecode_frame::frame[el];
 }
 
@@ -654,6 +656,11 @@ void timecode_frame::set_clockFlag(bool c) {
 
         frame[58] =  c ;
         this ->set_parity();}
+
+void timecode_frame::set_dropFlag(bool d) {
+	
+	frame[10] = d;
+}
 
 void timecode_frame::set_frameRate(frameRate f) {
     Fr = f;
@@ -694,10 +701,9 @@ int timecode_frame::return_hour(void) {
 	return timecode_frame::current_hour;
 }
 
-
 int timecode_frame::current_frameRate(void)
 {
 	return timecode_frame::Fr;
 }
 
-#endif // TIMECODE_H
+#endif // TIMECODE_CPP
