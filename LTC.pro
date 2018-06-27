@@ -10,8 +10,6 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = LTC
 TEMPLATE = app
-INCLUDEPATH += "C:/Users/stevensn2h/Source/Repos/Visual-Timecode-"
-INCLUDEPATH += "C:/"
 
 
 # The following define makes your compiler emit warnings if you use
@@ -30,24 +28,25 @@ CONFIG += c++14
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    ../../Source/Repos/Visual-Timecode-/manchester.cpp \
-    ../../Source/Repos/Visual-Timecode-/opal_interface.cpp \
-    ../../Source/Repos/Visual-Timecode-/timecode.cpp \
-    ../../Source/Repos/Visual-Timecode-/lowpass.cpp
+    lowpass.cpp \
+    manchester.cpp \
+    opal_interface.cpp \
+    timecode.cpp
+
 
 HEADERS += \
-        mainwindow.h \
-    ../../Source/Repos/Visual-Timecode-/manchester.h \
-    ../../Source/Repos/Visual-Timecode-/opal_interface.h \
-    ../../Source/Repos/Visual-Timecode-/timecode.h \
     mainwindow.h \
-    ../../../../al.h \
-    ../../../../alc.h \
-    ../../Source/Repos/Visual-Timecode-/lowpass.h
+    mainwindow.h \
+    al.h \
+    alc.h \
+    lowpass.h \
+    manchester.h \
+    opal_interface.h \
+    timecode.h
 
 FORMS += \
     mainwindow.ui
-        mainwindow.ui
+    mainwindow.ui
 
 
 LIBS += -L"C:/" -lOpenAL32
